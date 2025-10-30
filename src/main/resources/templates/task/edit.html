@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Редактирование задачи</title>
+    <meta charset="UTF-8">
+</head>
+<body>
+<h1>Редактирование задачи</h1>
+
+<div th:if="${message}" th:text="${message}"></div>
+
+<form method="post" th:action="@{/tasks/update}">
+    <input name="id" th:value="${task.id}" type="hidden">
+
+    <table border="1">
+        <tr>
+            <td><label for="title">Название: *</label></td>
+            <td><input id="title" name="title" required th:value="${task.title}" type="text"></td>
+            <td><span th:errors="*{title}" th:if="${#fields.hasErrors('title')}"></span></td>
+        </tr>
+        <tr>
+            <td><label for="user">Пользователь: *</label></td>
+            <td>
+                <select id="user" name="userId" required>
+                    <option value="">Выберите пользователя</option>
+                    <option th:each="user : ${allUsers}"
+                            th:selected="${task.user != null && task.user.id == user.id}"
+                            th:text="${user.name + ' (' + user.email + ')'}"
+                            th:value="${user.id}">
+                    </option>
+                </select>
+            </td>
+            <td><span th:errors="*{userId}" th:if="${#fields.hasErrors('userId')}"></span></td>
+        </tr>
+        <tr>
+            <td><label for="completed">Выполнена:</label></td>
+            <td><input id="completed" name="completed" th:checked="${task.completed}" type="checkbox"></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td></td>
+            <td>
+                <button type="submit">Обновить</button>
+                <a th:href="@{/tasks}">Отмена</a>
+            </td>
+            <td></td>
+        </tr>
+    </table>
+</form>
+
+<br>
+<hr>
+<a th:href="@{/}">На главную</a>
+<br>
+<a th:href="@{/tasks}">Управление задачами</a>
+</body>
+</html>

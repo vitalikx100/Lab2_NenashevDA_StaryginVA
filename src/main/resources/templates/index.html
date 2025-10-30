@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Система управления задачами</title>
+    <meta charset="UTF-8">
+</head>
+<body>
+<h1>Добро пожаловать в систему управления задачами</h1>
+
+<p>
+    <a th:href="@{/users}">Управление пользователями</a>
+</p>
+<p>
+    <a th:href="@{/tasks}">Управление задачами</a>
+</p>
+
+<hr>
+<h3>Статистика системы:</h3>
+<p>Всего пользователей: <span th:text="${userCount}">0</span></p>
+<p>Всего задач: <span th:text="${taskCount}">0</span></p>
+</body>
+</html>

@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Редактирование пользователя</title>
+    <meta charset="UTF-8">
+</head>
+<body>
+<h1>Редактирование пользователя</h1>
+
+<div th:if="${message}" th:text="${message}"></div>
+
+<form method="post" th:action="@{/users/update}" th:object="${user}">
+    <input th:field="*{id}" type="hidden">
+
+    <table border="1">
+        <tr>
+            <td><label for="name">Имя:</label></td>
+            <td><input id="name" required th:field="*{name}" type="text"></td>
+            <td><span th:errors="*{name}" th:if="${#fields.hasErrors('name')}"></span></td>
+        </tr>
+        <tr>
+            <td><label for="email">Email:</label></td>
+            <td><input id="email" required th:field="*{email}" type="email"></td>
+            <td><span th:errors="*{email}" th:if="${#fields.hasErrors('email')}"></span></td>
+        </tr>
+        <tr>
+            <td><label for="age">Возраст:</label></td>
+            <td><input id="age" required th:field="*{age}" type="number"></td>
+            <td><span th:errors="*{age}" th:if="${#fields.hasErrors('age')}"></span></td>
+        </tr>
+        <tr>
+            <td></td>
+            <td>
+                <button type="submit">Обновить</button>
+                <a th:href="@{/users}">Отмена</a>
+            </td>
+            <td></td>
+        </tr>
+    </table>
+</form>
+
+<br>
+<hr>
+<a th:href="@{/}">На главную</a>
+<br>
+<a th:href="@{/users}">Управление пользователями</a>
+</body>
+</html>
