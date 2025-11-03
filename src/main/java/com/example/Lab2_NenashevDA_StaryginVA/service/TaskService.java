@@ -32,7 +32,7 @@ public class TaskService {
         return taskRepository.findById(id);
     }
 
-    public Task createTask(Task task) {
+    public void createTask(Task task) {
         if (task.getUser() == null || task.getUser().getId() == null) {
             throw new RuntimeException("User must be specified for the task");
         }
@@ -41,10 +41,10 @@ public class TaskService {
                 .orElseThrow(() -> new RuntimeException("User not found with id: " + task.getUser().getId()));
 
         task.setUser(user);
-        return taskRepository.save(task);
+        taskRepository.save(task);
     }
 
-    public Task updateTask(Task task) {
+    public void updateTask(Task task) {
         if (!taskRepository.existsById(task.getId())) {
             throw new RuntimeException("Task with ID " + task.getId() + " not found");
         }
@@ -55,22 +55,14 @@ public class TaskService {
             task.setUser(user);
         }
 
-        return taskRepository.save(task);
+        taskRepository.save(task);
     }
 
     public void deleteTask(Integer id) {
         taskRepository.deleteById(id);
     }
 
-    public List<Task> getTasksByUser(Integer userId) {
-        return taskRepository.findByUser_Id(userId);
-    }
-
-    public long getTaskCountByUser(Integer userId) {
-        return taskRepository.countByUser_Id(userId);
-    }
-
-    public List<Task> getCompletedTasks(Boolean completed) {
-        return taskRepository.findByCompleted(completed);
+    public long getCompletedTasksCount() {
+        return taskRepository.countByCompletedTrue();
     }
 }

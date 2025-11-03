@@ -1,20 +1,15 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="Ru">
 <head>
-    <title>Редактирование задачи</title>
+    <title>Создание задачи</title>
     <meta charset="UTF-8">
 </head>
 <body>
-<h1>Редактирование задачи</h1>
+<h1>Создание новой задачи</h1>
 
 <a th:href="@{/tasks}">← Назад к списку задач</a>
 
-<form th:action="@{/tasks/edit/{id}(id=${task.id})}" th:object="${task}" method="post">
-    <div>
-        <label>ID:</label>
-        <span th:text="${task.id}"></span>
-    </div>
-
+<form th:action="@{/tasks/create}" th:object="${task}" method="post">
     <div>
         <label>Название:</label>
         <label>
@@ -26,11 +21,10 @@
     <div>
         <label>Пользователь:</label>
         <label>
-            <select th:field="*{user.id}" required>
+            <select th:field="*{user}" required>
                 <option value="">-- Выберите пользователя --</option>
                 <option th:each="user : ${users}"
                         th:value="${user.id}"
-                        th:selected="${task.user?.id == user.id}"
                         th:text="${user.name + ' (' + user.email + ')'}"></option>
             </select>
         </label>
@@ -52,7 +46,7 @@
         </label>
     </div>
 
-    <button type="submit">Сохранить изменения</button>
+    <button type="submit">Создать задачу</button>
 </form>
 
 <div th:if="${error}" style="color: red;">

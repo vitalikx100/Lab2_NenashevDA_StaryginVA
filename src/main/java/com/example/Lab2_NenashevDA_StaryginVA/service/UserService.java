@@ -28,27 +28,23 @@ public class UserService {
         return userRepository.findById(id);
     }
 
-    public Optional<User> getUserByEmail(String email) {
-        return userRepository.findByEmail(email);
-    }
-
-    public User createUser(User user) {
+    public void createUser(User user) {
         try {
             if (userRepository.existsByEmail(user.getEmail())) {
                 throw new RuntimeException("User with email " + user.getEmail() + " already exists");
             }
-            return userRepository.save(user);
+            userRepository.save(user);
         } catch (Exception e) {
             throw new RuntimeException("Error creating user: " + e.getMessage(), e);
         }
     }
 
-    public User updateUser(User user) {
+    public void updateUser(User user) {
         try {
             if (!userRepository.existsById(user.getId())) {
                 throw new RuntimeException("User with ID " + user.getId() + " not found");
             }
-            return userRepository.save(user);
+            userRepository.save(user);
         } catch (Exception e) {
             throw new RuntimeException("Error updating user: " + e.getMessage(), e);
         }
@@ -56,9 +52,5 @@ public class UserService {
 
     public void deleteUser(Integer id) {
         userRepository.deleteById(id);
-    }
-
-    public boolean userExists(Integer id) {
-        return userRepository.existsById(id);
     }
 }

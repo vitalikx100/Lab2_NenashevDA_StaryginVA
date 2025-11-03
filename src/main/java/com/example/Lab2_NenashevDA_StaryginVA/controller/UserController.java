@@ -4,15 +4,16 @@ import com.example.Lab2_NenashevDA_StaryginVA.model.User;
 import com.example.Lab2_NenashevDA_StaryginVA.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
 
-@RestController
-@RequestMapping("/api/users")
+@Controller
+@RequestMapping("/users")
 public class UserController {
 
     private final UserService userService;
@@ -23,42 +24,61 @@ public class UserController {
     }
 
     @GetMapping
-    public ResponseEntity<List<User>> getAllUsers() {
+    public String getAllUsers(Model model) {
         List<User> users = userService.getAllUsers();
-        return ResponseEntity.ok(users);
+        model.addAttribute("users", users);
+        return "user/list";
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<User> getUserById(@PathVariable Integer id) {
-        Optional<User> user = userService.getUserById(id);
-        return user.map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+    @GetMapping("/create")
+    public String showCreateForm(Model model) {
+        model.addAttribute("user", new User());
+        return "user/create";
     }
 
-    @PostMapping
-    public ResponseEntity<?> createUser(@Valid @RequestBody User user) {
+    @PostMapping("/create")
+    public String createUser(@Valid @ModelAttribute User user, BindingResult result, Model model) {
+        if (result.hasErrors()) {
+            return "user/create";
+        }
         try {
-            User createdUser = userService.createUser(user);
-            return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
+            userService.createUser(user);
+            return "redirect:/users";
         } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            model.addAttribute("error", e.getMessage());
+            return "user/create";
         }
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<?> updateUser(@PathVariable Integer id, @Valid @RequestBody User user) {
+    @GetMapping("/edit/{id}")
+    public String showEditForm(@PathVariable Integer id, Model model) {
+        Optional<User> user = userService.getUserById(id);
+        if (user.isPresent()) {
+            model.addAttribute("user", user.get());
+            return "user/edit";
+        } else {
+            return "redirect:/users";
+        }
+    }
+
+    @PostMapping("/edit/{id}")
+    public String updateUser(@PathVariable Integer id, @Valid @ModelAttribute User user, BindingResult result, Model model) {
+        if (result.hasErrors()) {
+            return "user/edit";
+        }
         try {
             user.setId(id);
-            User updatedUser = userService.updateUser(user);
-            return ResponseEntity.ok(updatedUser);
+            userService.updateUser(user);
+            return "redirect:/users";
         } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            model.addAttribute("error", e.getMessage());
+            return "user/edit";
         }
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteUser(@PathVariable Integer id) {
+    @GetMapping("/delete/{id}")
+    public String deleteUser(@PathVariable Integer id) {
         userService.deleteUser(id);
-        return ResponseEntity.noContent().build();
+        return "redirect:/users";
     }
 }

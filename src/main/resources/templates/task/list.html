@@ -1,53 +1,27 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" lang="Ru">
 <head>
-    <title>Управление задачами</title>
+    <title>Список задач</title>
     <meta charset="UTF-8">
+    <style>
+        table { border-collapse: collapse; width: 100%; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+        .completed { text-decoration: line-through; color: #888; }
+    </style>
 </head>
 <body>
-<h1>Управление задачами</h1>
+<h1>Список задач</h1>
 
-<div th:if="${message}" th:text="${message}"></div>
+<a th:href="@{/}">На главную</a> |
+<a th:href="@{/tasks/create}">Создать новую задачу</a>
 
-<form method="post" th:action="@{/tasks}">
-    <table border="1">
-        <tr>
-            <td><label for="title">Название: *</label></td>
-            <td><input id="title" name="title" required type="text"></td>
-            <td><span th:errors="*{title}" th:if="${#fields.hasErrors('title')}"></span></td>
-        </tr>
-        <tr>
-            <td><label for="user">Пользователь: *</label></td>
-            <td>
-                <select id="user" name="userId" required>
-                    <option value="">Выберите пользователя</option>
-                    <option th:each="user : ${allUsers}"
-                            th:text="${user.name + ' (' + user.email + ')'}"
-                            th:value="${user.id}">
-                    </option>
-                </select>
-            </td>
-            <td><span th:errors="*{userId}" th:if="${#fields.hasErrors('userId')}"></span></td>
-        </tr>
-        <tr>
-            <td><label for="completed">Выполнена:</label></td>
-            <td><input id="completed" name="completed" type="checkbox"></td>
-            <td></td>
-        </tr>
-        <tr>
-            <td></td>
-            <td>
-                <button type="submit">Добавить задачу</button>
-            </td>
-            <td></td>
-        </tr>
-    </table>
-</form>
+<div class="stats">
+    <h3>Статистика задач:</h3>
+    <p>Количество завершенных задач: <strong th:text="${completedCount}">0</strong></p>
+</div>
 
-<hr>
-
-<h2>Список задач</h2>
-<table border="1">
+<table>
     <thead>
     <tr>
         <th>ID</th>
@@ -62,31 +36,19 @@
     <tr th:each="task : ${tasks}">
         <td th:text="${task.id}"></td>
         <td th:text="${task.title}"></td>
-        <td th:text="${task.user.name}"></td>
+        <td th:text="${task.user?.name} ?: 'Не назначен'"></td>
         <td th:text="${#temporals.format(task.createdDate, 'dd.MM.yyyy')}"></td>
         <td>
-            <span th:if="${task.completed}">Завершена</span>
+            <span th:if="${task.completed}" class="completed">Выполнена</span>
             <span th:unless="${task.completed}">В работе</span>
         </td>
         <td>
-            <a th:href="@{/tasks/edit/{id}(id=${task.id})}">Редактировать</a>
-            |
+            <a th:href="@{/tasks/edit/{id}(id=${task.id})}">Редактировать</a> |
             <a th:href="@{/tasks/delete/{id}(id=${task.id})}"
-               th:onclick="'return confirm(\'Удалить задачу ' + ${task.title} + '?\')'">Удалить</a>
-            |
-            <a th:href="@{/tasks/toggle/{id}(id=${task.id})}">
-                <span th:if="${task.completed}">Возобновить</span>
-                <span th:unless="${task.completed}">Завершить</span>
-            </a>
+               onclick="return confirm('Удалить задачу?')">Удалить</a>
         </td>
     </tr>
     </tbody>
 </table>
-
-<br>
-<hr>
-<a th:href="@{/}">На главную</a>
-<br>
-<a th:href="@{/users}">Управление пользователями</a>
 </body>
 </html>

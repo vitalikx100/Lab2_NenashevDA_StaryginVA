@@ -2,81 +2,95 @@ package com.example.Lab2_NenashevDA_StaryginVA.controller;
 
 import com.example.Lab2_NenashevDA_StaryginVA.model.Task;
 import com.example.Lab2_NenashevDA_StaryginVA.service.TaskService;
+import com.example.Lab2_NenashevDA_StaryginVA.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
 
-@RestController
-@RequestMapping("/api/tasks")
+@Controller
+@RequestMapping("/tasks")
 public class TaskController {
 
     private final TaskService taskService;
+    private final UserService userService;
 
     @Autowired
-    public TaskController(TaskService taskService) {
+    public TaskController(TaskService taskService, UserService userService) {
         this.taskService = taskService;
+        this.userService = userService;
     }
 
     @GetMapping
-    public ResponseEntity<List<Task>> getAllTasks() {
+    public String getAllTasks(Model model) {
         List<Task> tasks = taskService.getAllTasks();
-        return ResponseEntity.ok(tasks);
+        long completedCount = taskService.getCompletedTasksCount();
+
+        model.addAttribute("tasks", tasks);
+        model.addAttribute("completedCount", completedCount);
+        return "task/list";
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<Task> getTaskById(@PathVariable Integer id) {
-        Optional<Task> task = taskService.getTaskById(id);
-        return task.map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+    @GetMapping("/create")
+    public String showCreateForm(Model model) {
+        model.addAttribute("task", new Task());
+        model.addAttribute("users", userService.getAllUsers());
+        return "task/create";
     }
 
-    @GetMapping("/user/{userId}")
-    public ResponseEntity<List<Task>> getTasksByUser(@PathVariable Integer userId) {
-        List<Task> tasks = taskService.getTasksByUser(userId);
-        return ResponseEntity.ok(tasks);
-    }
-
-    @GetMapping("/user/{userId}/count")
-    public ResponseEntity<Long> getTaskCountByUser(@PathVariable Integer userId) {
-        long count = taskService.getTaskCountByUser(userId);
-        return ResponseEntity.ok(count);
-    }
-
-    @GetMapping("/completed/{completed}")
-    public ResponseEntity<List<Task>> getTasksByCompletion(@PathVariable Boolean completed) {
-        List<Task> tasks = taskService.getCompletedTasks(completed);
-        return ResponseEntity.ok(tasks);
-    }
-
-    @PostMapping
-    public ResponseEntity<?> createTask(@Valid @RequestBody Task task) {
+    @PostMapping("/create")
+    public String createTask(@Valid @ModelAttribute Task task, BindingResult result, Model model) {
+        if (result.hasErrors()) {
+            model.addAttribute("users", userService.getAllUsers());
+            return "task/create";
+        }
         try {
-            Task createdTask = taskService.createTask(task);
-            return ResponseEntity.status(HttpStatus.CREATED).body(createdTask);
+            taskService.createTask(task);
+            return "redirect:/tasks";
         } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            model.addAttribute("error", e.getMessage());
+            model.addAttribute("users", userService.getAllUsers());
+            return "task/create";
         }
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<?> updateTask(@PathVariable Integer id, @Valid @RequestBody Task task) {
+    @GetMapping("/edit/{id}")
+    public String showEditForm(@PathVariable Integer id, Model model) {
+        Optional<Task> task = taskService.getTaskById(id);
+        if (task.isPresent()) {
+            model.addAttribute("task", task.get());
+            model.addAttribute("users", userService.getAllUsers());
+            return "task/edit";
+        } else {
+            return "redirect:/tasks";
+        }
+    }
+
+    @PostMapping("/edit/{id}")
+    public String updateTask(@PathVariable Integer id, @Valid @ModelAttribute Task task, BindingResult result, Model model) {
+        if (result.hasErrors()) {
+            model.addAttribute("users", userService.getAllUsers());
+            return "task/edit";
+        }
         try {
             task.setId(id);
-            Task updatedTask = taskService.updateTask(task);
-            return ResponseEntity.ok(updatedTask);
+            taskService.updateTask(task);
+            return "redirect:/tasks";
         } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            model.addAttribute("error", e.getMessage());
+            model.addAttribute("users", userService.getAllUsers());
+            return "task/edit";
         }
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteTask(@PathVariable Integer id) {
+    @GetMapping("/delete/{id}")
+    public String deleteTask(@PathVariable Integer id) {
         taskService.deleteTask(id);
-        return ResponseEntity.noContent().build();
+        return "redirect:/tasks";
     }
 }

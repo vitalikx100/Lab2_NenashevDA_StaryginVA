@@ -1,52 +1,27 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" lang="Ru">
 <head>
-    <title>Управление пользователями</title>
+    <title>Список пользователей</title>
     <meta charset="UTF-8">
+    <style>
+        table { border-collapse: collapse; width: 100%; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+    </style>
 </head>
 <body>
-<h1>Управление пользователями</h1>
+<h1>Список пользователей</h1>
 
-<div th:if="${message}" th:text="${message}"></div>
+<a th:href="@{/}">На главную</a> |
+<a th:href="@{/users/create}">Создать нового пользователя</a>
 
-<form method="post" th:action="@{/users}" th:object="${user}">
-    <table border="1">
-        <tr>
-            <td><label for="name">Имя: *</label></td>
-            <td><input id="name" required th:field="*{name}" type="text"></td>
-            <td><span th:errors="*{name}" th:if="${#fields.hasErrors('name')}"></span></td>
-        </tr>
-        <tr>
-            <td><label for="email">Email: *</label></td>
-            <td><input id="email" required th:field="*{email}" type="email"></td>
-            <td><span th:errors="*{email}" th:if="${#fields.hasErrors('email')}"></span></td>
-        </tr>
-        <tr>
-            <td><label for="age">Возраст: *</label></td>
-            <td><input id="age" required th:field="*{age}" type="number"></td>
-            <td><span th:errors="*{age}" th:if="${#fields.hasErrors('age')}"></span></td>
-        </tr>
-        <tr>
-            <td></td>
-            <td>
-                <button type="submit">Добавить пользователя</button>
-            </td>
-            <td></td>
-        </tr>
-    </table>
-</form>
-
-<hr>
-
-<h2>Список пользователей</h2>
-<table border="1">
+<table>
     <thead>
     <tr>
         <th>ID</th>
         <th>Имя</th>
         <th>Email</th>
         <th>Возраст</th>
-        <th>Количество задач</th>
         <th>Действия</th>
     </tr>
     </thead>
@@ -56,23 +31,14 @@
         <td th:text="${user.name}"></td>
         <td th:text="${user.email}"></td>
         <td th:text="${user.age}"></td>
-        <td th:text="${taskCounts[user.id]} ?: 0"></td>
         <td>
-            <a th:href="@{/users/edit/{id}(id=${user.id})}">Редактировать</a>
-            |
+            <a th:href="@{/users/edit/{id}(id=${user.id})}">Редактировать</a> |
             <a th:href="@{/users/delete/{id}(id=${user.id})}"
-               th:onclick="'return confirm(\'Удалить пользователя ' + ${user.name} + '?\')'">Удалить</a>
-            |
-            <a th:href="@{/tasks/user/{userId}(userId=${user.id})}">Задачи</a>
+               onclick="return confirm('Удалить пользователя?')">Удалить</a>
         </td>
     </tr>
     </tbody>
 </table>
 
-<br>
-<hr>
-<a th:href="@{/}">На главную</a>
-<br>
-<a th:href="@{/tasks}">Управление задачами</a>
 </body>
 </html>

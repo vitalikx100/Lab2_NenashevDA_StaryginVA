@@ -1,20 +1,15 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="Ru">
 <head>
-    <title>Редактирование пользователя</title>
+    <title>Создание пользователя</title>
     <meta charset="UTF-8">
 </head>
 <body>
-<h1>Редактирование пользователя</h1>
+<h1>Создание нового пользователя</h1>
 
 <a th:href="@{/users}">← Назад к списку пользователей</a>
 
-<form th:action="@{/users/edit/{id}(id=${user.id})}" th:object="${user}" method="post">
-    <div>
-        <label>ID:</label>
-        <span th:text="${user.id}"></span>
-    </div>
-
+<form th:action="@{/users/create}" th:object="${user}" method="post">
     <div>
         <label>Имя:</label>
         <label>
@@ -39,7 +34,7 @@
         <span th:if="${#fields.hasErrors('age')}" th:errors="*{age}"></span>
     </div>
 
-    <button type="submit">Сохранить изменения</button>
+    <button type="submit">Создать пользователя</button>
 </form>
 
 <div th:if="${error}" style="color: red;">
